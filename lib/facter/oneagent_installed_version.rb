@@ -69,7 +69,6 @@ Facter.add(:oneagent_installed_version) do
     if nil == version
       version = '0.0.0.0'
     end
-    Puppet.info("Installed oneagent agent version -> '#{version}'")
     version
   end
 end

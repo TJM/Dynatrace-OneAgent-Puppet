@@ -69,7 +69,6 @@ Facter.add(:ruxit_installed_version) do
     if nil == version
       version = '0.0.0.0'
     end
-    Puppet.info("Installed ruxit agent version -> '#{version}'")
 		version
 	end
 end
