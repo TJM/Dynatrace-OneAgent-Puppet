@@ -8,10 +8,10 @@ require 'facter'
 require 'puppet'
 
 Facter.add(:ruxit_installed_version) do
-	setcode do
-	  version = nil
-	  file = nil
-	  os_key = nil
+  setcode do
+    version = nil
+    file = nil
+    os_key = nil
     if Facter.value('kernel').eql? 'windows'
       if Facter.value('architecture').eql? 'x64'
         file = 'C:/Program Files (x86)/ruxit/agent/conf/binaries.json'
@@ -22,22 +22,22 @@ Facter.add(:ruxit_installed_version) do
       end
     elsif Facter.value('kernel').eql? 'Linux'
       file = '/opt/ruxit/agent/conf/binaries.json'
-      if Facter.value('architecture').eql? 'x64'
-        os_key = 'linux-x86-64'
-      else
-        os_key = 'linux-x86-32'
-      end
+      os_key = if Facter.value('architecture').eql? 'x64'
+                 'linux-x86-64'
+               else
+                 'linux-x86-32'
+               end
     elsif Facter.value('kernel').eql? 'AIX'
       file = '/opt/dynatrace/oneagent/agent/conf/binaries.json'
-      if Facter.value('architecture').eql? 'x64'
-        os_key = 'aix-ppc-64'
-      else
-        os_key = 'aix-ppc-32'
-      end
+      os_key = if Facter.value('architecture').eql? 'x64'
+                 'aix-ppc-64'
+               else
+                 'aix-ppc-32'
+               end
     end
-    if nil != file
+    unless file.nil?
       begin
-        if File.exists?(file)
+        if File.exist?(file)
           if File.stat(file).size < (1024 * 15) # don't read files larger than 15KB
             begin
               file_content = File.read(file)
@@ -45,10 +45,10 @@ Facter.add(:ruxit_installed_version) do
               raise "IO error: #{e.inspect}"
             end
             hash = JSON.parse(file_content)
-            if hash != nil
+            if !hash.nil?
               # check the installer version for the java installer
               if hash.keys.include? 'os'
-                  version = hash['os']['main'][os_key]['installer-version']
+                version = hash['os']['main'][os_key]['installer-version']
               else
                 raise 'JSON does not contain expected values'
               end # hash.keys.include 'os'
@@ -66,9 +66,9 @@ Facter.add(:ruxit_installed_version) do
       end
     end # kernel check
     # fallback so we don't have to check for undefined values in puppet
-    if nil == version
+    if version.nil?
       version = '0.0.0.0'
     end
-		version
-	end
+    version
+  end
 end
